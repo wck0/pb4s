@@ -7,7 +7,7 @@ since gocomics uses the following structure:
 http://www.gocomics.com/nameofthecomicstrip/YYYY/MM/DD
 
 The motivation for creating this script is the following: up until January
-2017, gocmics.com supported RSS feeds for each of the comics it hosts.
+2017, gocomics.com supported RSS feeds for each of the comics it hosts.
 The site also underwent a redesign around the same time.
 I wanted a way to see the comic without having to look at all the extra
 cruft on the page.

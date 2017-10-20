@@ -1,9 +1,12 @@
 # pb4s
 
 This script fetches and saves an image of a comic from gocomics.com
-Without modification, it only gets the comic for the current day.
-It would be easy to change the url to get a comic for a particular date,
-since gocomics uses the following structure:
+
+You can call it with options to specify which comic and date you want.
+For example, running the program as
+`pb4s.py -c nameofthecomicstrip -d YYYYMMDD`
+will go and grab the strip located at
+
 http://www.gocomics.com/nameofthecomicstrip/YYYY/MM/DD
 
 The motivation for creating this script is the following: up until January

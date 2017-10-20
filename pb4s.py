@@ -23,15 +23,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import sys
+import sys, os
 import getopt
+import datetime
 
 from lxml import html
 import requests
 
-def getcomic(comicname):
+def getcomic(comicname, date=None):
     imgtag = "og:image"    
     url = 'http://www.gocomics.com/' + comicname + '/'
+    if date and validdate(date):
+        YYYY = date[:4]
+        MM = date[4:6]
+        DD = date[6:]
+        url += YYYY + '/' + MM + '/' + DD
     page = requests.get(url)
     
     # we want to parse the page content in a nice way.
@@ -64,15 +70,36 @@ def savecomic(comic):
 
     # finally, write the comic image to a file.
     # note: it seems to be a jpg on Sundays, and a gif all the other days
-    with open(filename, 'wb') as f:
+    dirname = filename[:2]
+    if not os.path.isdir(dirname):
+        os.makedirs(dirname)
+    with open(dirname + "/" + filename, 'wb') as f:
         for chunk in comic:
             f.write(chunk)
-    print("saved file", filename)
-    return
+    print("saved file", dirname + "/" + filename)
+    return dirname + "/" + filename
+
+def convert2png(filename):
+    from PIL import Image
+    im = Image.open(filename)
+    pngfilename = filename[:filename.rfind('.')] + ".png"
+    im.save(pngfilename)
+    print("Saved file", pngfilename)
+    return pngfilename
+
+def validdate(date):
+    try:
+        datetime.datetime.strptime(date, "%Y%m%d")
+        return True
+    except ValueError:
+        return False
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "hc:v", ["help", "comicname=", "verbose"])
+        opts, args = getopt.getopt(argv,
+                                   "hcd:v",
+                                   ["help", "comicname=", "date=", "verbose"]
+                                  )
     except getopt.GetoptError as err:
         # print help information and exit:
         print(str(err))  # will print something like "option -a not recognized"
@@ -81,6 +108,7 @@ def main(argv):
     comicname = 'pearlsbeforeswine'
     output = None
     verbose = False
+    date = None
     for o, a in opts:
         if o == "-v":
             verbose = True # not implemented
@@ -89,17 +117,25 @@ def main(argv):
             sys.exit()
         elif o in ("-c", "--comicname"):
             comicname = a
+        elif o in ("-d", "--date"):
+            date = a
+            if not validdate(date):
+                print("Invalid date format. Should be YYYYMMDD")
+                usage()
+                sys.exit()
         else:
             assert False, "unhandled option"
     try:
-        comic = getcomic(comicname)
+        comic = getcomic(comicname, date=date)
     except Exception as e:
         print("Unable to download comic.")
         print(e)
         sys.exit()
         
     if comic.status_code == 200:
-        savecomic(comic)
+        savedFile = savecomic(comic)
+        pngfilename = convert2png(savedFile)
+        os.system('eog ' + pngfilename)
         sys.exit()
     else:
         print("Received status code", comic.status_code)
@@ -112,5 +148,4 @@ def usage():
     return
 
 if __name__ == '__main__':
-    
     main(sys.argv[1:])

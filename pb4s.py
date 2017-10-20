@@ -97,7 +97,7 @@ def validdate(date):
 def main(argv):
     try:
         opts, args = getopt.getopt(argv,
-                                   "hcd:v",
+                                   "hc:d:v",
                                    ["help", "comicname=", "date=", "verbose"]
                                   )
     except getopt.GetoptError as err:

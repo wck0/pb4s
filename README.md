@@ -9,7 +9,7 @@ will go and grab the strip located at
 
 http://www.gocomics.com/nameofthecomicstrip/YYYY/MM/DD
 
-By default, `-c` is `pearlsbeforeswine` and `d` is today.
+By default, `-c` is `pearlsbeforeswine` and `-d` is today.
 
 The motivation for creating this script is the following: up until January
 2017, gocomics.com supported RSS feeds for each of the comics it hosts.
@@ -21,8 +21,12 @@ The script requires the lxml and requests python libraries, which you can
 install by doing
 `pip3 install lxml`
 `pip3 install requests`
-or use `pip` instead if you are using python2
 
-The script should work fine for both python2 and python3.
-No error handling of any sort is implemented, but might be introduced in the
-future.
+# TODO
+* Switch from `getopt` to `argparse`
+* add some functionality to the `-h` option
+* make it all more object oriented, with something like a `comic` object 
+that has methods to do all the downloading, converting file types, displaying, 
+etc.
+
+

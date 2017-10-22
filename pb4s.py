@@ -24,7 +24,7 @@
 # SOFTWARE.
 
 import sys, os
-import getopt
+import argparse
 import datetime
 
 from lxml import html
@@ -94,37 +94,50 @@ def validdate(date):
     except ValueError:
         return False
 
-def main(argv):
-    try:
-        opts, args = getopt.getopt(argv,
-                                   "hc:d:v",
-                                   ["help", "comicname=", "date=", "verbose"]
-                                  )
-    except getopt.GetoptError as err:
-        # print help information and exit:
-        print(str(err))  # will print something like "option -a not recognized"
-        usage()
-        sys.exit(2)
-    comicname = 'pearlsbeforeswine'
-    output = None
-    verbose = False
-    date = None
-    for o, a in opts:
-        if o == "-v":
-            verbose = True # not implemented
-        elif o in ("-h", "--help"):
-            usage()
+def listcomics():
+    with open('allcomics.txt', 'r') as f:
+        allcomics = f.readlines()
+    for comicname in sorted(allcomics):
+        print(comicname)
+
+def main():
+    parser = argparse.ArgumentParser(prog='pb4s',
+                                     description="Download a comic from gocomics.com"
+                                    )
+    parser.add_argument('-c', '--comicname',
+                        nargs='?',
+                        help='name of comic to download',
+                        const='pearlsbeforeswine',
+                        default='pearlsbeforeswine'
+                       )
+    parser.add_argument('-d', '--date',
+                        nargs='?',
+                        help='date of comic to download in YYYYMMDD format'
+                       )
+    parser.add_argument('-l', '--list-comic-names',
+                        action='store_true',
+                        dest='listthem',
+                        help='List all available comic names. There are a lot of them.'
+                       )
+    args = parser.parse_args()
+    
+    if args.listthem:
+        listcomics()
+        sys.exit()
+    
+    if args.comicname:
+        comicname = args.comicname
+    else:
+        comicname = 'pearlsbeforeswine'
+    if args.date:
+        date = args.date
+        if not validdate(date):
+            print("Invalid date. Format should be YYYYMMDD")
+            parser.print_help()
             sys.exit()
-        elif o in ("-c", "--comicname"):
-            comicname = a
-        elif o in ("-d", "--date"):
-            date = a
-            if not validdate(date):
-                print("Invalid date format. Should be YYYYMMDD")
-                usage()
-                sys.exit()
-        else:
-            assert False, "unhandled option"
+    else:
+        date = None
+    
     try:
         comic = getcomic(comicname, date=date)
     except Exception as e:
@@ -142,10 +155,5 @@ def main(argv):
         print("Exiting")
         sys.exit()
 
-
-def usage():
-    print("Documentation TBD")
-    return
-
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()

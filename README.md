@@ -23,8 +23,6 @@ install by doing
 `pip3 install requests`
 
 # TODO
-* Switch from `getopt` to `argparse`
-* add some functionality to the `-h` option
 * make it all more object oriented, with something like a `comic` object 
 that has methods to do all the downloading, converting file types, displaying, 
 etc.

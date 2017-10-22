@@ -119,6 +119,11 @@ def main():
                         dest='listthem',
                         help='List all available comic names. There are a lot of them.'
                        )
+    parser.add_argument('-o', '--open-comic',
+                        action='store_true',
+                        dest='opencomic',
+                        help='Open the comic after downloading it.'
+                       )
     args = parser.parse_args()
     
     if args.listthem:
@@ -132,7 +137,7 @@ def main():
     if args.date:
         date = args.date
         if not validdate(date):
-            print("Invalid date. Format should be YYYYMMDD")
+            print("Invalid date.")
             parser.print_help()
             sys.exit()
     else:
@@ -148,7 +153,8 @@ def main():
     if comic.status_code == 200:
         savedFile = savecomic(comic)
         pngfilename = convert2png(savedFile)
-        os.system('eog ' + pngfilename)
+        if args.opencomic:
+            os.system('eog ' + pngfilename)
         sys.exit()
     else:
         print("Received status code", comic.status_code)

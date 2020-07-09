@@ -31,17 +31,17 @@ from lxml import html
 import requests
 
 def getcomic(comicname, date=None):
-    imgtag = "og:image"    
-    url = 'http://www.gocomics.com/' + comicname + '/'
+    imgtag = "og:image"
     if date and validdate(date):
         YYYY = date[:4]
         MM = date[4:6]
         DD = date[6:]
-        url += YYYY + '/' + MM + '/' + DD
     else:
         today = datetime.datetime.today()
-        suffix = today.strftime("%Y/%m/%d")
-        url += suffix
+        YYYY = today.year
+        MM = today.month
+        DD = today.day
+    url = f"http://www.gocomics.com/{comicname}/{YYYY}/{MM:02d}/{DD:02d}"
     page = requests.get(url)
     
     # we want to parse the page content in a nice way.

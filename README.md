@@ -17,10 +17,11 @@ The site also underwent a redesign around the same time.
 I wanted a way to see the comic without having to look at all the extra
 cruft on the page.
 
-The script requires the lxml and requests python libraries, which you can
+The script requires the lxml, requests, and Pillow python libraries, which you can
 install by doing
 `pip3 install lxml`
 `pip3 install requests`
+`pip3 install Pillow`
 
 # TODO
 * make it all more object oriented, with something like a `comic` object 

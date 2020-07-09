@@ -38,10 +38,10 @@ def getcomic(comicname, date=None):
         DD = date[6:]
     else:
         today = datetime.datetime.today()
-        YYYY = today.year
-        MM = today.month
-        DD = today.day
-    url = f"http://www.gocomics.com/{comicname}/{YYYY}/{MM:02d}/{DD:02d}"
+        YYYY = f"{today.year}"
+        MM = f"{today.month:02d}"
+        DD = f"{today.day:02d}"
+    url = f"http://www.gocomics.com/{comicname}/{YYYY}/{MM}/{DD}"
     page = requests.get(url)
     
     # we want to parse the page content in a nice way.
@@ -58,7 +58,7 @@ def getcomic(comicname, date=None):
     # ('property', 'og:image'), ('content', url to comic image file)
     # The url we want is in the content attribute.
 
-    comicurl = mm[0].items()[1][1]
+    comicurl = mm[0].get('content')
     comic = requests.get(comicurl)
     return comic
 

@@ -98,7 +98,7 @@ def listcomics():
     with open('allcomics.txt', 'r') as f:
         allcomics = f.readlines()
     for comicname in sorted(allcomics):
-        print(comicname)
+        print(comicname.rstrip())
 
 def main():
     parser = argparse.ArgumentParser(prog='pb4s',

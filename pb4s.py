@@ -38,6 +38,10 @@ def getcomic(comicname, date=None):
         MM = date[4:6]
         DD = date[6:]
         url += YYYY + '/' + MM + '/' + DD
+    else:
+        today = datetime.datetime.today()
+        suffix = today.strftime("%Y/%m/%d")
+        url += suffix
     page = requests.get(url)
     
     # we want to parse the page content in a nice way.
@@ -53,6 +57,7 @@ def getcomic(comicname, date=None):
     # itself a tuple. For our tag, mm[0].items() is the following:
     # ('property', 'og:image'), ('content', url to comic image file)
     # The url we want is in the content attribute.
+
     comicurl = mm[0].items()[1][1]
     comic = requests.get(comicurl)
     return comic

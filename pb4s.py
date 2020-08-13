@@ -23,12 +23,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import sys, os
+import sys
+import os
 import argparse
 import datetime
 
 from lxml import html
 import requests
+
 
 def getcomic(comicname, date=None):
     imgtag = "og:image"
@@ -43,15 +45,15 @@ def getcomic(comicname, date=None):
         DD = f"{today.day:02d}"
     url = f"http://www.gocomics.com/{comicname}/{YYYY}/{MM}/{DD}"
     page = requests.get(url)
-    
+
     # we want to parse the page content in a nice way.
     tree = html.fromstring(page.content)
-    
+
     # the url for the comic image is specified in the header, in a meta tag with
     # attribute property="og:image", but we want the url which is given by the
     # content attribute of the same tag
     mm = tree.xpath('//meta[@property="og:image"]')
-    
+
     # mm is a list with one item: a single Element meta.
     # mm[0].items() gives a list of the meta tag attributes, each of which is
     # itself a tuple. For our tag, mm[0].items() is the following:
@@ -61,6 +63,7 @@ def getcomic(comicname, date=None):
     comicurl = mm[0].get('content')
     comic = requests.get(comicurl)
     return comic
+
 
 def savecomic(comic):
     # comic should be a Response object, i.e. the result of doing a
@@ -84,6 +87,7 @@ def savecomic(comic):
     print("saved file", dirname + "/" + filename)
     return dirname + "/" + filename
 
+
 def convert2png(filename):
     from PIL import Image
     im = Image.open(filename)
@@ -92,6 +96,7 @@ def convert2png(filename):
     print("Saved file", pngfilename)
     return pngfilename
 
+
 def validdate(date):
     try:
         datetime.datetime.strptime(date, "%Y%m%d")
@@ -99,42 +104,49 @@ def validdate(date):
     except ValueError:
         return False
 
+
 def listcomics():
     with open('allcomics.txt', 'r') as f:
         allcomics = f.readlines()
     for comicname in sorted(allcomics):
         print(comicname.rstrip())
 
+
 def main():
-    parser = argparse.ArgumentParser(prog='pb4s',
-                                     description="Download a comic from gocomics.com"
-                                    )
-    parser.add_argument('-c', '--comicname',
-                        nargs='?',
-                        help='name of comic to download',
-                        const='pearlsbeforeswine',
-                        default='pearlsbeforeswine'
-                       )
-    parser.add_argument('-d', '--date',
-                        nargs='?',
-                        help='date of comic to download in YYYYMMDD format'
-                       )
-    parser.add_argument('-l', '--list-comic-names',
-                        action='store_true',
-                        dest='listthem',
-                        help='List all available comic names. There are a lot of them.'
-                       )
-    parser.add_argument('-o', '--open-comic',
-                        action='store_true',
-                        dest='opencomic',
-                        help='Open the comic after downloading it.'
-                       )
+    parser = argparse.ArgumentParser(
+        prog='pb4s',
+        description="Download a comic from gocomics.com"
+    )
+    parser.add_argument(
+        '-c', '--comicname',
+        nargs='?',
+        help='name of comic to download',
+        const='pearlsbeforeswine',
+        default='pearlsbeforeswine'
+    )
+    parser.add_argument(
+        '-d', '--date',
+        nargs='?',
+        help='date of comic to download in YYYYMMDD format'
+    )
+    parser.add_argument(
+        '-l', '--list-comic-names',
+        action='store_true',
+        dest='listthem',
+        help='List all available comic names. There are a lot of them.'
+    )
+    parser.add_argument(
+        '-o', '--open-comic',
+        action='store_true',
+        dest='opencomic',
+        help='Open the comic after downloading it.'
+    )
     args = parser.parse_args()
-    
+
     if args.listthem:
         listcomics()
         sys.exit()
-    
+
     if args.comicname:
         comicname = args.comicname
     else:
@@ -147,14 +159,14 @@ def main():
             sys.exit()
     else:
         date = None
-    
+
     try:
         comic = getcomic(comicname, date=date)
     except Exception as e:
         print("Unable to download comic.")
         print(e)
         sys.exit()
-        
+
     if comic.status_code == 200:
         savedFile = savecomic(comic)
         pngfilename = convert2png(savedFile)
@@ -165,6 +177,7 @@ def main():
         print("Received status code", comic.status_code)
         print("Exiting")
         sys.exit()
+
 
 if __name__ == '__main__':
     main()
